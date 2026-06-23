@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Should I Get Claude Enterprise? — Cisco AI Eligibility Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#16243B;
+  --paper:#F8F4EA;
+  --paper-dim:#EFE9DB;
+  --line:#D8D2C2;
+  --muted:#7A8496;
+  --green:#2D5C52;
+  --green-bg:#E4EDE7;
+  --amber:#9B6E1A;
+  --amber-bg:#F3E8D2;
+  --slate:#3D5A73;
+  --slate-bg:#E1E8ED;
+  --red:#9C4F3C;
+  --red-bg:#F2E0D8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 10% 0%,#1f3350 0%,transparent 55%),
+    radial-gradient(ellipse at 90% 100%,#122036 0%,transparent 50%),
+    #0f1c2e;
+  font-family:'Inter',system-ui,sans-serif;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:40px 16px 60px;
+}
+.wrap{width:100%;max-width:640px}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  letter-spacing:.14em;
+  color:#7FA0C0;
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:rgba(127,160,192,.3)}
+.card{
+  background:var(--paper);
+  border-radius:6px;
+  box-shadow:0 32px 64px -24px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.25) inset;
+  padding:40px 40px 32px;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(transparent,transparent 27px,rgba(0,0,0,.04) 28px);
+  pointer-events:none;
+}
+
+/* progress bar */
+.progress{display:flex;gap:6px;margin-bottom:28px}
+.prog-seg{flex:1;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.prog-seg span{display:block;height:100%;background:var(--green);width:0%;transition:width .4s ease}
+.prog-seg.done span{width:100%}
+.prog-seg.active span{width:60%}
+
+h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:8px}
+.step-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px}
+p.desc{font-size:14.5px;color:var(--muted);line-height:1.55;margin-bottom:24px;max-width:50ch}
+
+/* category checkboxes */
+.category-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.cat-item{
+  display:flex;align-items:flex-start;gap:12px;
+  border:1.5px solid var(--line);border-radius:4px;
+  padding:14px 16px;cursor:pointer;
+  transition:border-color .15s,background .15s;
+  user-select:none;
+}
+.cat-item:hover{border-color:var(--green);background:#f4f8f6}
+.cat-item.selected{border-color:var(--green);background:var(--green-bg)}
+.cat-item input[type=checkbox]{display:none}
+.cat-box{
+  width:18px;height:18px;min-width:18px;
+  border:1.5px solid var(--line);border-radius:3px;
+  margin-top:1px;display:flex;align-items:center;justify-content:center;
+  transition:background .15s,border-color .15s;
+}
+.cat-item.selected .cat-box{background:var(--green);border-color:var(--green)}
+.cat-check{color:#fff;font-size:11px;display:none}
+.cat-item.selected .cat-check{display:block}
+.cat-text{flex:1}
+.cat-title{font-weight:600;font-size:14.5px;color:var(--ink);display:block;margin-bottom:2px}
+.cat-sub{font-size:13px;color:var(--muted)}
+
+/* signal questions */
+.signal-list{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
+.signal-q{border:1.5px solid var(--line);border-radius:4px;padding:16px}
+.signal-q p{font-size:14.5px;color:var(--ink);line-height:1.45;margin-bottom:12px;font-weight:500}
+.signal-btns{display:flex;gap:8px}
+.sig-btn{
+  flex:1;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;
+  padding:9px 6px;border-radius:3px;border:1.5px solid var(--line);
+  background:transparent;color:var(--ink);cursor:pointer;
+  transition:background .13s,color .13s,border-color .13s;
+}
+.sig-btn:hover{background:var(--ink);color:var(--paper)}
+.sig-btn.sel-yes{background:var(--green);color:#fff;border-color:var(--green)}
+.sig-btn.sel-no{background:#6B7280;color:#fff;border-color:#6B7280}
+
+/* text area */
+textarea{
+  width:100%;min-height:130px;border:1.5px solid var(--line);border-radius:4px;
+  padding:14px;font-family:'Inter',sans-serif;font-size:14.5px;color:var(--ink);
+  background:var(--paper);resize:vertical;line-height:1.55;
+  transition:border-color .15s;margin-bottom:8px;
+}
+textarea:focus{outline:none;border-color:var(--green)}
+.char-hint{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:20px}
+
+/* buttons */
+.btn-row{display:flex;gap:10px;justify-content:space-between;align-items:center}
+.btn-primary{
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;
+  padding:13px 24px;border-radius:4px;border:1.5px solid var(--ink);
+  background:var(--ink);color:var(--paper);cursor:pointer;
+  transition:opacity .13s;
+}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary:not(:disabled):hover{opacity:.85}
+.btn-ghost{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;
+  color:var(--muted);background:none;border:none;cursor:pointer;
+  text-decoration:underline;padding:0;
+}
+
+/* loading */
+.loading{text-align:center;padding:24px 0}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--line);
+  border-top-color:var(--green);border-radius:50%;
+  animation:spin 1s linear infinite;margin:0 auto 16px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:.05em}
+
+/* verdict */
+.verdict-wrap{position:relative}
+.score-line{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);letter-spacing:.05em;margin-bottom:14px}
+.stamp{
+  display:inline-block;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;
+  letter-spacing:.02em;padding:12px 18px;border:3px solid currentColor;
+  border-radius:5px;transform:rotate(-2.5deg);
+  margin:2px 0 20px;max-width:100%;
+  animation:stamp .4s cubic-bezier(.2,1.4,.4,1);
+}
+@keyframes stamp{0%{transform:rotate(-2.5deg) scale(2.2);opacity:0}100%{transform:rotate(-2.5deg) scale(1);opacity:1}}
+.stamp.circuit{color:var(--slate);background:var(--slate-bg)}
+.stamp.manager{color:var(--amber);background:var(--amber-bg)}
+.stamp.enterprise{color:var(--green);background:var(--green-bg)}
+.stamp.error{color:var(--red);background:var(--red-bg)}
+
+.verdict-headline{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.verdict-reasoning{font-size:14.5px;color:var(--ink);line-height:1.6;margin-bottom:16px}
+
+.signal-card{border-radius:4px;padding:14px 16px;margin-bottom:12px}
+.signal-card.key{background:#F0F4F2;border-left:4px solid var(--green)}
+.signal-card.circuit-first{background:#F6F4EE;border-left:4px solid #B9802F}
+.signal-card-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.signal-card-text{font-size:13.5px;color:var(--ink);line-height:1.5}
+
+.next-step{
+  background:var(--paper-dim);border-radius:4px;
+  padding:16px;margin:16px 0 0;
+}
+.next-step-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.next-step-text{font-size:14px;color:var(--ink);font-weight:500}
+
+.foot{margin-top:24px;padding-top:14px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+
+/* error */
+.err-msg{color:var(--red);font-size:13px;font-family:'IBM Plex Mono',monospace;margin-top:10px}
+
+@media(prefers-reduced-motion:reduce){.stamp{animation:none}.spinner{animation:none}}
+@media(max-width:480px){
+  .card{padding:28px 20px 24px}
+  h1{font-size:22px}
+  .cat-item{padding:12px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Cisco · Claude Enterprise Eligibility</p>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+const CATS = [
+  { id:"code",  title:"Writing or maintaining Cisco source code", sub:"Multi-file edits, refactoring, debugging across a codebase" },
+  { id:"research", title:"Research & synthesis across many long documents", sub:"Contracts, technical docs, competitive analysis, regulatory content" },
+  { id:"workflow", title:"Multi-step iterative workflows", sub:"Research → draft → revise → refine, across many turns and sessions" },
+  { id:"team", title:"Team knowledge base or shared project context", sub:"Building persistent context a whole team draws from" },
+  { id:"other", title:"Something else I'll describe below", sub:"A complex or sustained use I'll explain in my own words" },
+];
+
+// Four criteria — match Job Aid B and the storyboard exactly
+const CRITERIA = [
+  { label:"Volume", text:"Does this work involve a large amount of material to hold at once — 15+ long documents, or a complex multi-file codebase — not just a single quick exchange?" },
+  { label:"Session depth", text:"Do your working sessions run 2+ hours with many iterative rounds, where losing earlier context or progress would meaningfully hurt the result?" },
+  { label:"Stakes", text:"Does the output go to executive leadership, external stakeholders, or production systems — where mistakes carry real consequences?" },
+  { label:"Demonstrated Circuit gap", text:"Have you actually tried this in Circuit (Claude Opus 4.6, Deep Research mode, or Circuit's coding help) and found it consistently falling short — not just assumed it would be?" },
+];
+
+const CIRCUIT_TIPS = {
+  code: "Try Claude Sonnet 4 in Circuit for individual functions or files first. If you consistently need consistent edits across many files at once, that's the strongest signal for Path A (coding).",
+  research: "Try Claude Opus 4.6 with Deep Research mode in Circuit on your next research cycle — it handles a surprising amount of multi-source synthesis before Enterprise is justified.",
+  workflow: "Store your framework or reference material in My Projects and run the workflow with Claude Opus 4.6 across one or two sessions before assuming Circuit can't keep up.",
+  team: "Check whether Circuit's Agent Studio or My Projects can already serve as the shared team knowledge base before requesting an Enterprise seat.",
+  other: "Try describing this exact task to Claude Opus 4.6 in Circuit and see how far it gets before assuming you need something more.",
+};
+
+let step = 0; // 0=categories, 1=criteria, 2=describe, 3=verdict
+let selectedCats = new Set();
+let answers = [null, null, null, null]; // null | true | false
+let description = "";
+
+function progress(active){
+  return `<div class="progress">
+    ${[0,1,2,3].map(i=>`<div class="prog-seg ${i<active?'done':i===active?'active':''}"><span></span></div>`).join('')}
+  </div>`;
+}
+// NodeList.prototype.forEach isn't supported in every browser/embedded webview —
+// use a plain Array.prototype.forEach.call instead so listener attachment never silently fails.
+function each(nodeList, fn){
+  Array.prototype.forEach.call(nodeList, fn);
+}
+
+// ---- STEP 0: categories ----
+function renderCategories(){
+  document.getElementById('card').innerHTML = `
+    <h1>Should I get Claude Enterprise?</h1>
+    ${progress(0)}
+    <div class="step-label">Step 1 of 3 · What kind of work?</div>
+    <p class="desc">Select everything that describes what you plan to use Claude Enterprise for. Pick all that apply.</p>
+    <div class="category-grid">
+      ${CATS.map(c=>`
+        <div class="cat-item${selectedCats.has(c.id)?' selected':''}" data-id="${c.id}" role="checkbox" aria-checked="${selectedCats.has(c.id)}" tabindex="0">
+          <div class="cat-box"><span class="cat-check">✓</span></div>
+          <div class="cat-text"><span class="cat-title">${c.title}</span><span class="cat-sub">${c.sub}</span></div>
+        </div>`).join('')}
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="restart()">start over</button>
+      <button class="btn-primary" id="nextBtn" onclick="goCriteria()" ${selectedCats.size===0?'disabled':''}>Next →</button>
+    </div>
+    <div class="foot"><span>Circuit is free & available now</span><span></span></div>
+  `;
+  each(document.querySelectorAll('.cat-item'), function(el){
+    const toggle = ()=>{
+      const id = el.dataset.id;
+      if(selectedCats.has(id)){ selectedCats.delete(id); el.classList.remove('selected'); el.setAttribute('aria-checked','false'); }
+      else { selectedCats.add(id); el.classList.add('selected'); el.setAttribute('aria-checked','true'); }
+      document.getElementById('nextBtn').disabled = selectedCats.size===0;
+    };
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
+    });
+  });
+}
+
+// ---- STEP 1: four criteria ----
+function goCriteria(){ step=1; renderCriteria(); }
+function renderCriteria(){
+  document.getElementById('card').innerHTML = `
+    <h1>Four quick questions</h1>
+    ${progress(1)}
+    <div class="step-label">Step 2 of 3 · The four criteria</div>
+    <p class="desc">Answer honestly about your typical work — not the most intense week. All four matter; this isn't about hitting just one or two.</p>
+    <div class="signal-list">
+      ${CRITERIA.map((q,i)=>`
+        <div class="signal-q">
+          <p><strong>${q.label}.</strong> ${q.text}</p>
+          <div class="signal-btns">
+            <button class="sig-btn${answers[i]===true?' sel-yes':''}" data-i="${i}" data-v="1">Yes</button>
+            <button class="sig-btn${answers[i]===false?' sel-no':''}" data-i="${i}" data-v="0">No</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="step=0;renderCategories()">← back</button>
+      <button class="btn-primary" id="nextBtn2" onclick="goDescribe()" ${answers.some(a=>a===null)?'disabled':''}>Next →</button>
+    </div>
+    <div class="foot"><span>Circuit is free & available now</span><span></span></div>
+  `;
+  each(document.querySelectorAll('.sig-btn'), function(btn){
+    btn.addEventListener('click',()=>{
+      const i=parseInt(btn.dataset.i), v=parseInt(btn.dataset.v)===1;
+      answers[i]=v;
+      each(document.querySelectorAll(`.sig-btn[data-i="${i}"]`), function(b){ b.classList.remove('sel-yes','sel-no'); });
+      btn.classList.add(v?'sel-yes':'sel-no');
+      document.getElementById('nextBtn2').disabled = answers.some(a=>a===null);
+    });
+  });
+}
+
+// ---- STEP 2: describe ----
+function goDescribe(){ step=2; renderDescribe(); }
+function renderDescribe(){
+  document.getElementById('card').innerHTML = `
+    <h1>Describe your work</h1>
+    ${progress(2)}
+    <div class="step-label">Step 3 of 3 · In your own words</div>
+    <p class="desc">Optional, but worth it: this description gets built into a ready-to-paste Circuit prompt on the next screen so you can get a fuller, personalized read from Claude — not just the four yes/no answers.</p>
+    <textarea id="descBox" placeholder="Example: I spend 3–4 days per week synthesizing 20–30 long regulatory documents into a single risk summary, iterating on the draft many times as new documents come in. Circuit's Claude handles individual questions well but loses context across a long session…">${description}</textarea>
+    <div class="char-hint" id="charHint">0 words — optional, but more detail gives a better Circuit assessment</div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goCriteria()">← back</button>
+      <button class="btn-primary" onclick="renderVerdict()">See my result →</button>
+    </div>
+    <div class="foot"><span>Your instant result is calculated locally — no data leaves this page</span><span></span></div>
+  `;
+  const box = document.getElementById('descBox');
+  const hint = document.getElementById('charHint');
+  box.addEventListener('input',()=>{
+    description = box.value;
+    const wc = description.trim().split(/\s+/).filter(Boolean).length;
+    hint.textContent = `${wc} word${wc!==1?'s':''} — ${wc<20?'optional, but more detail gives a better Circuit assessment':'good detail — this will make a strong Circuit prompt'}`;
+  });
+  box.value = description;
+  box.dispatchEvent(new Event('input'));
+}
+
+// ---- scoring (instant, local, no network) ----
+function computeVerdict(){
+  const score = answers.filter(Boolean).length;
+  const codeOnly = selectedCats.has('code') && selectedCats.size === 1;
+  let tier;
+  if(score >= 4) tier = 'enterprise';
+  else if(score === 3) tier = 'manager';
+  else tier = 'circuit';
+
+  const hitLabels = CRITERIA.filter((c,i)=>answers[i]).map(c=>c.label);
+  const missLabels = CRITERIA.filter((c,i)=>!answers[i]).map(c=>c.label);
+
+  const headlines = {
+    circuit: "Circuit likely covers this",
+    manager: "Strong signals, but not complete",
+    enterprise: "Clear case for Enterprise",
+  };
+  const reasoningTemplates = {
+    circuit: `You matched ${score} of 4 criteria${hitLabels.length?` (${hitLabels.join(', ')})`:''}. That's below the bar this framework uses — all four criteria need to be present, not just one or two. ${missLabels.length?`In particular, ${missLabels.join(' and ')} didn't apply.`:''} Circuit's free Claude models are built for exactly this level of work.`,
+    manager: `You matched 3 of 4 criteria (${hitLabels.join(', ')}), with ${missLabels.join(' and ')} not clearly present. That's a real signal, but not a complete case yet — bring this to your manager along with specifics on the missing criterion before requesting a seat.`,
+    enterprise: `You matched all 4 criteria: ${hitLabels.join(', ')}. That's the complete Path B picture — ongoing, high-volume, high-stakes work where Circuit has demonstrably fallen short. This is a legitimate case to bring to your manager.`,
+  };
+  const nextSteps = {
+    circuit: "Use Claude Sonnet 4 or Opus 4.6 inside Circuit — no request needed.",
+    manager: "Talk to your manager and document specifically where Circuit fell short before deciding whether to request a seat.",
+    enterprise: "Ask your manager to route a request to leadership and the Product Organization. Expect a VPN step and a budget conversation ($1,000/month per seat).",
+  };
+
+  const tipKeys = Array.from(selectedCats).filter(k=>CIRCUIT_TIPS[k]);
+  const circuitFirst = tipKeys.length ? tipKeys.slice(0,2).map(k=>CIRCUIT_TIPS[k]).join(' ') : CIRCUIT_TIPS.other;
+
+  return {
+    tier, score,
+    headline: headlines[tier],
+    reasoning: reasoningTemplates[tier],
+    nextStep: nextSteps[tier],
+    circuitFirst,
+    codeOnly,
+  };
+}
+
+function buildCircuitPrompt(){
+  const catLabels = CATS.filter(c=>selectedCats.has(c.id)).map(c=>c.title);
+  const answerLines = CRITERIA.map((c,i)=>`- ${c.label}: ${answers[i]?'Yes':'No'}`).join('\n');
+  return `I'm a Cisco employee trying to figure out whether my work justifies a Claude Enterprise seat ($1,000/month) instead of using Circuit's free Claude access. Please give me an honest assessment.
+
+WORK CATEGORIES I SELECTED:
+${catLabels.map(l=>`- ${l}`).join('\n')}
+
+MY ANSWERS TO THE FOUR ENTERPRISE CRITERIA:
+${answerLines}
+
+MY OWN DESCRIPTION OF THE WORK:
+"${description || '(not provided — please ask me follow-up questions if you need more detail)'}"
+
+For context on the framework: Claude Enterprise at Cisco is justified through two paths. Path A is advanced coding — regularly writing/maintaining Cisco source code and needing multi-file or class-level edits Circuit can't handle. Path B is a complex sustained workflow that meets ALL FOUR of: (1) regularly synthesizing 15+ large documents in one session, (2) sessions of 2+ hours where losing context mid-session hurts output, (3) executive or external stakes where errors have real consequences, and (4) a demonstrated (not assumed) gap where Claude Opus 4.6 and Deep Research mode in Circuit have consistently fallen short.
+
+Please tell me honestly: does my work fit Path A or Path B? What's missing if it doesn't? And what's one specific thing I should try in Circuit before requesting Enterprise, regardless of your answer?`;
+}
+
+// ---- STEP 3: verdict (instant, local) ----
+function renderVerdict(){
+  step=3;
+  const v = computeVerdict();
+  const stampCls = v.tier==='enterprise'?'enterprise':v.tier==='manager'?'manager':'circuit';
+  const stampText = v.tier==='enterprise'?'STRONG CASE FOR ENTERPRISE':v.tier==='manager'?'TALK TO YOUR MANAGER':'USE CIRCUIT';
+  const scoreParts = [
+    selectedCats.size + ' work type' + (selectedCats.size!==1?'s':'') + ' selected',
+    v.score + ' of 4 criteria matched',
+  ].join(' · ');
+  const circuitPrompt = buildCircuitPrompt();
+
+  document.getElementById('card').innerHTML = `
+    <div class="verdict-wrap">
+      <h1>Your instant result</h1>
+      ${progress(3)}
+      <div class="score-line">${scoreParts.toUpperCase()}</div>
+      <div class="stamp ${stampCls}">${stampText}</div>
+      <div class="verdict-headline">${v.headline}</div>
+      <p class="verdict-reasoning">${v.reasoning}</p>
+      <div class="signal-card circuit-first">
+        <div class="signal-card-label">Try in Circuit first</div>
+        <div class="signal-card-text">${v.circuitFirst}</div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-label">Your next step</div>
+        <div class="next-step-text">${v.nextStep}</div>
+      </div>
+
+      <div class="circuit-prompt-section">
+        <div class="signal-card-label" style="margin-top:22px">Want a fuller, personalized read?</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin:6px 0 12px">This quick result is based only on your four yes/no answers. For an assessment that actually considers your written description, copy the prompt below and paste it into Circuit — using Claude Opus 4.6 — to get Claude's full reasoning.</p>
+        <textarea id="promptBox" readonly style="min-height:140px;font-family:'IBM Plex Mono',monospace;font-size:12px">${circuitPrompt}</textarea>
+        <div class="btn-row" style="margin-top:10px">
+          <span id="copyStatus" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--green)"></span>
+          <button class="btn-primary" onclick="copyPrompt()">Copy prompt for Circuit</button>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:24px">
+        <button class="btn-ghost" onclick="restart()">start over</button>
+        <button class="btn-ghost" onclick="goDescribe()">← revise description</button>
+      </div>
+      <div class="foot"><span>Calculated locally · not a final approval</span><span></span></div>
+    </div>
+  `;
+}
+
+function copyPrompt(){
+  const box = document.getElementById('promptBox');
+  const status = document.getElementById('copyStatus');
+  box.focus();
+  box.select();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(box.value).then(function(){
+      status.textContent = "Copied ✓ — now paste into Circuit";
+    }).catch(function(){
+      fallbackCopy(status);
+    });
+  } else {
+    fallbackCopy(status);
+  }
+}
+function fallbackCopy(status){
+  try {
+    document.execCommand('copy');
+    status.textContent = "Copied ✓ — now paste into Circuit";
+  } catch(e){
+    status.textContent = "Text is selected — press Ctrl+C / Cmd+C";
+  }
+}
+
+function restart(){
+  step=0; selectedCats=new Set(); answers=[null,null,null,null]; description="";
+  renderCategories();
+}
+
+renderCategories();
+</script>
+</body>
+</html>
